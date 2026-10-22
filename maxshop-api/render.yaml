@@ -1,0 +1,40 @@
+databases:
+  - name: maxshop-db
+    plan: free
+    databaseName: maxshop
+    user: maxshop
+
+services:
+  - type: web
+    name: maxshop-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: maxshop-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: maxshop-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: maxshop-db
+          property: database
+      - key: DATABASE_URL
+        value: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: maxshop-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: maxshop-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://maxshop.vercel.app
